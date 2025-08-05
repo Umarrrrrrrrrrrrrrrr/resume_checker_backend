@@ -3,7 +3,7 @@ import pdfplumber
 
 def load_resumes_and_labels(folder_path):
     texts, labels = [], []
-    for files in os.listdir(folder_path):
+    for file in os.listdir(folder_path):
         if file.endswith('.pdf'):
             with pdfplumber.open(os.path.join(folder_path, file)) as pdf:
                 text = ''
