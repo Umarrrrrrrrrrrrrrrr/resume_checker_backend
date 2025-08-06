@@ -13,3 +13,6 @@ def load_resumes_and_labels(folder_path):
                 score = int(file.split('_')[-1].replace('.pdf', ''))
                 labels.append(score)
     return texts, labels
+
+
+    
