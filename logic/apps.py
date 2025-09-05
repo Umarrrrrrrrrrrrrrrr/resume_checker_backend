@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class AnsariConfig(AppConfig):
+class LogicConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'Ansari'
+    name = 'logic'
