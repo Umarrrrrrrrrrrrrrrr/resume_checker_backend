@@ -21,5 +21,31 @@ class ResumeUploadView(APIView):
             for page in pdf.pages:
                 parsed_text += page.extract_text() or ''
 
+        # ------- Simple Grading logic ---------------#
+        word_count = len(parsed_text.split())
+
+        # Example grading logic
+        if word_count < 100:
+            grade = 40
+        elif word_count < 300:
+            grade = 70
+        else:
+            grade = 90
+
+        # Check for important words:
+        keyword = ["Python", "Django", "React", "AI", "Machine Learning"]
+        keyword_hits = sum(1 for word in keyword if word.lower() in parsed_text.lower())
+
+        grade += keyword_hits * 2
+
+        # Ensure grade doesnot exceed 100
+        grade = min(grade, 100)
+
+        return Response({
+            'text': parsed_text,
+            'grade' : grade
+        })
+
+
         return Response({'text': parsed_text})
            
