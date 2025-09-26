@@ -21,12 +21,34 @@ class ResumeUploadView(APIView):
             for page in pdf.pages:
                 parsed_text += page.extract_text() or ''
 
-        # ------- Simple Grading logic ---------------#
+        # ------- Grading logic / Length (15%) ---------------#
         word_count = len(parsed_text.split())
+        if word_count < 100:
+            grade += 5      # Too short
+        elif word_count < 300:
+            grade += 10     # Average
+        else: 
+            grade += 15     # Well-detailed
+
+        # 2.Keywords / Technical skills (25%)
+        keywords = ["Python", "Django", "React", "AI", "Machine Learning", "JavaScript", "SQL", "AWS", "TeamWork", "Leadership"]
+        keyword_hits = sum(1 for word in keywords if word.lower() in parsed_text.lower())
+        grade += min(keyword_hits * 2.5, 25)    # Cap at 25%
+
+        # 3. Structure check (20%)
+        sections = ["Education", "Experience", "Skills", "Projects", "Certifications", "Summary"]
+        sections_hits = sum(1 for section in sections if section.lower() in parsed_text.lower())
+        grade += min(sections_hits * 4, 20)
+        
+        # 4. Achievements / Action verbs    (15%)
+        action_verbs = ["developed", "designed", "managed", "led", "built", "implemented", "achieved", "created"]
+        action_hits = sum(1 for verb in action_verbs if verb.lower() in parsed_text.lower())
+        grade += min(action_hits * 2, 15)
+
 
         # Example grading logic
         if word_count < 100:
-            grade = 40
+            grade += 5          # Too Short
         elif word_count < 300:
             grade = 70
         else:
