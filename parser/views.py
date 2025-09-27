@@ -21,6 +21,11 @@ class ResumeUploadView(APIView):
             for page in pdf.pages:
                 parsed_text += page.extract_text() or ''
 
+
+
+        # Initialize grade
+        grade = 0
+
         # ------- Grading logic / Length (15%) ---------------#
         word_count = len(parsed_text.split())
         if word_count < 100:
@@ -46,28 +51,53 @@ class ResumeUploadView(APIView):
         grade += min(action_hits * 2, 15)
 
 
-        # Example grading logic
-        if word_count < 100:
-            grade += 5          # Too Short
-        elif word_count < 300:
-            grade = 70
-        else:
-            grade = 90
+        # 5. professionalism (10%)
+        if "@" in parsed_text:          # Email present
+            grade += 5
+        if "linkedin" in parsed_text.lower():
+            grade += 15
 
-        # Check for important words:
-        keyword = ["Python", "Django", "React", "AI", "Machine Learning"]
-        keyword_hits = sum(1 for word in keyword if word.lower() in parsed_text.lower())
-
-        grade += keyword_hits * 2
+        # 6. Overall Balance (15%)
+        if 300 <= word_count <= 1000 and sections_hits >= 3:
+            grade += 15
 
         # Ensure grade doesnot exceed 100
-        grade = min(grade, 100)
+        grade = min(int(grade), 100)
 
+        # -------------------------Response--------------------
         return Response({
             'text': parsed_text,
-            'grade' : grade
+            'grade': grade,
+            'word_count': word_count,
+            'keyword_hits': keyword_hits,
+            'sections_found': sections_hits,
+            'action_words': action_hits
         })
+        
 
 
-        return Response({'text': parsed_text})
+        # # Example grading logic
+        # if word_count < 100:
+        #     grade += 5          # Too Short
+        # elif word_count < 300:
+        #     grade = 70
+        # else:
+        #     grade = 90
+
+        # # Check for important words:
+        # keyword = ["Python", "Django", "React", "AI", "Machine Learning"]
+        # keyword_hits = sum(1 for word in keyword if word.lower() in parsed_text.lower())
+
+        # grade += keyword_hits * 2
+
+        # # Ensure grade doesnot exceed 100
+        # grade = min(grade, 100)
+
+        # return Response({
+        #     'text': parsed_text,
+        #     'grade' : grade
+        # })
+
+
+        # return Response({'text': parsed_text})
            
