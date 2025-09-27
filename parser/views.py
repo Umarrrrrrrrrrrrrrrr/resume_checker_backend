@@ -9,28 +9,28 @@ import pdfplumber
 
 
 class ResumeUploadView(APIView):
-    parser_classes = (MultiPartParser, FormParser)
+    parser_classes = (MultiPartParser, FormParser)   # File upload handling
 
     def post(self, request, *args, **kwargs):
-        pdf_file = request.FILES.get('pdf')
+        pdf_file = request.FILES.get('pdf')             # retrives the uploaded file with the key "pdf"
         if not pdf_file:
-            return Response({'error': 'No file uploaded'}, status = 400)
+            return Response({'error': 'No file uploaded'}, status = 400)        # If no file, it returns error 
         
-        parsed_text = ' '
-        with pdfplumber.open(pdf_file) as pdf:
+        parsed_text = ' '                           # extract text from PDF
+        with pdfplumber.open(pdf_file) as pdf:         # Uses pdfplumber to read each page of the uploaded PDF
             for page in pdf.pages:
-                parsed_text += page.extract_text() or ''
+                parsed_text += page.extract_text() or ''        # All pages text is concatenated into parsed_text
 
 
 
         # Initialize grade
-        grade = 0
+        grade = 0           #  The grading starts with 0
 
         # ------- Grading logic / Length (15%) ---------------#
         word_count = len(parsed_text.split())
-        if word_count < 100:
+        if word_count < 50:
             grade += 5      # Too short
-        elif word_count < 300:
+        elif word_count < 200:
             grade += 10     # Average
         else: 
             grade += 15     # Well-detailed
