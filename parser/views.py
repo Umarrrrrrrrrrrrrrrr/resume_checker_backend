@@ -3,6 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
 import pdfplumber
+#import requests       # For communicating with ollama
 
 
 # Create your views here.
@@ -16,6 +17,9 @@ class ResumeUploadView(APIView):
         if not pdf_file:
             return Response({'error': 'No file uploaded'}, status = 400)        # If no file, it returns error 
         
+
+
+        # Extract text from the PDF
         parsed_text = ' '                           # extract text from PDF
         with pdfplumber.open(pdf_file) as pdf:         # Uses pdfplumber to read each page of the uploaded PDF
             for page in pdf.pages:
