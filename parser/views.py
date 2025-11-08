@@ -23,7 +23,7 @@ class ResumeUploadView(APIView):
                     page_text = page.extract_text() or ''
                     parsed_text += page_text + "\n"
                     
-            print(f"📄 Extracted {len(parsed_text)} characters from PDF")
+            print(f" Extracted {len(parsed_text)} characters from PDF")
             
             if len(parsed_text.strip()) == 0:
                 return Response({
@@ -57,7 +57,7 @@ class ResumeUploadView(APIView):
         """
 
         try:
-            print(f"🤖 Using model: stablelm-zephyr...")
+            print(f" Using model: stablelm-zephyr...")
             
             response = requests.post(
                 "http://localhost:11434/api/generate",
@@ -74,14 +74,14 @@ class ResumeUploadView(APIView):
                 timeout=120  # Longer timeout for stablelm-zephyr
             )
 
-            print(f"📡 Response status: {response.status_code}")
+            print(f" Response status: {response.status_code}")
             
             if response.status_code == 200:
                 ai_response = response.json()
                 ai_response_text = ai_response.get("response", "")
                 
-                print(f"✅ stablelm-zephyr responded! Response length: {len(ai_response_text)}")
-                print(f"📋 Raw response preview: {ai_response_text[:200]}...")
+                print(f" stablelm-zephyr responded! Response length: {len(ai_response_text)}")
+                print(f" Raw response preview: {ai_response_text[:200]}...")
                 
                 # Enhanced JSON extraction for stablelm-zephyr
                 json_text = self.extract_json_from_response(ai_response_text)
@@ -89,7 +89,7 @@ class ResumeUploadView(APIView):
                 if json_text:
                     try:
                         ai_data = json.loads(json_text)
-                        print(f"🎯 Successfully parsed JSON from stablelm-zephyr")
+                        print(f" Successfully parsed JSON from stablelm-zephyr")
                         
                         # Process grade with validation
                         grade = self.process_grade(ai_data.get("grade", 50))
@@ -106,12 +106,12 @@ class ResumeUploadView(APIView):
                         })
                         
                     except json.JSONDecodeError as e:
-                        print(f"⚠️ JSON parsing error: {str(e)}")
-                        print(f"📋 Problematic JSON: {json_text[:200]}")
+                        print(f" JSON parsing error: {str(e)}")
+                        print(f" Problematic JSON: {json_text[:200]}")
                         return self.get_fallback_response(parsed_text, "JSON parsing failed")
                 
                 else:
-                    print(f"⚠️ No JSON found in response")
+                    print(f" No JSON found in response")
                     # Try to extract any numerical score from the response
                     grade = self.extract_grade_from_text(ai_response_text)
                     return Response({
@@ -128,14 +128,14 @@ class ResumeUploadView(APIView):
             
             else:
                 error_msg = f"Model error: {response.status_code} - {response.text}"
-                print(f"❌ {error_msg}")
+                print(f" {error_msg}")
                 return Response({
                     'error': 'AI model is not responding properly.',
                     'details': 'Please check if stablelm-zephyr is installed and running.'
                 }, status=500)
                 
         except requests.exceptions.Timeout:
-            print(f"⏰ stablelm-zephyr timeout")
+            print(f" stablelm-zephyr timeout")
             return Response({
                 'error': 'AI analysis timed out. The model is taking too long to respond.'
             }, status=504)
@@ -145,7 +145,7 @@ class ResumeUploadView(APIView):
                 'error': 'Cannot connect to AI service. Please ensure Ollama is running on localhost:11434'
             }, status=503)
         except Exception as e:
-            print(f"💥 stablelm-zephyr error: {str(e)}")
+            print(f" stablelm-zephyr error: {str(e)}")
             return self.get_fallback_response(parsed_text, str(e))
 
     def extract_json_from_response(self, text):
