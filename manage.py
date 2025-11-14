@@ -3,7 +3,7 @@
 import os
 import sys
 
-
+# this is a comment
 def main():
     """Run administrative tasks."""
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'resume_checker.settings')
